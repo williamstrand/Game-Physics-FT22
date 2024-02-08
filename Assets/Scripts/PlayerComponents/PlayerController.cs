@@ -6,6 +6,7 @@ namespace PlayerComponents
     {
         [SerializeField] MovementComponent movementComponent;
         [SerializeField] CameraComponent cameraComponent;
+        [SerializeField] ShootComponent shootComponent;
 
         [SerializeField] float speed = 5;
         [SerializeField] float cameraSpeed = 5;
@@ -14,6 +15,16 @@ namespace PlayerComponents
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
+        }
+
+        void Update()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                var direction = transform.forward;
+                direction.y = cameraComponent.CameraForward.y;
+                shootComponent.Shoot(cameraComponent.CameraPosition, direction);
+            }
         }
 
         void FixedUpdate()
