@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace PlayerComponents
 {
@@ -6,7 +7,8 @@ namespace PlayerComponents
     {
         [SerializeField] MovementComponent movementComponent;
         [SerializeField] CameraComponent cameraComponent;
-        [SerializeField] ShootComponent shootComponent;
+        [FormerlySerializedAs("shootComponent")][SerializeField]
+        GrappleComponent grappleComponent;
 
         [SerializeField] float speed = 5;
         [SerializeField] float cameraSpeed = 5;
@@ -21,9 +23,19 @@ namespace PlayerComponents
         {
             if (Input.GetMouseButtonDown(0))
             {
-                var direction = transform.forward;
-                direction.y = cameraComponent.CameraForward.y;
-                shootComponent.Shoot(cameraComponent.CameraPosition, direction);
+                grappleComponent.Shoot(cameraComponent.CameraPosition, cameraComponent.CameraForward);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                if (grappleComponent.IsGrappled)
+                {
+                    grappleComponent.LetGo();
+                }
+                else
+                {
+                    movementComponent.Jump();
+                }
             }
         }
 
@@ -31,6 +43,8 @@ namespace PlayerComponents
         {
             var cameraDirection = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
             cameraComponent.Rotate(cameraDirection, cameraSpeed * Time.fixedDeltaTime);
+
+            if (grappleComponent.IsGrappled) return;
 
             var direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
             var translatedDirection = direction.x * Vector3.right + direction.y * Vector3.forward;
