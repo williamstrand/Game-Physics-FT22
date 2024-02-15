@@ -13,6 +13,7 @@ namespace PlayerComponents
         Vector3 grappledPosition;
         public bool IsGrappled { get; private set; }
 
+
         public void Shoot(Vector3 origin, Vector3 direction)
         {
             var ray = new Ray(origin, direction);
@@ -26,9 +27,8 @@ namespace PlayerComponents
             rigidbody.useGravity = false;
 
             lineRenderer.positionCount = 2;
-            lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, grappledPosition);
         }
+
 
         public void LetGo()
         {
@@ -49,13 +49,13 @@ namespace PlayerComponents
 
         void FixedUpdate()
         {
-            if (IsGrappled)
-            {
-                var direction = grappledPosition - transform.position;
-                direction.Normalize();
-                // rigidbody.AddForce(direction * grappleSpeed, ForceMode.VelocityChange);
-                rigidbody.velocity = direction * grappleSpeed;
-            }
+            if (!IsGrappled) return;
+
+            var direction = (grappledPosition - transform.position).normalized;
+
+            rigidbody.AddForce(direction * grappleSpeed, ForceMode.VelocityChange);
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, grappledPosition);
         }
     }
 }

@@ -21,6 +21,9 @@ namespace PlayerComponents
 
         void Update()
         {
+            var cameraDirection = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            cameraComponent.Rotate(cameraDirection, cameraSpeed * Time.deltaTime);
+
             if (Input.GetMouseButtonDown(0))
             {
                 grappleComponent.Shoot(cameraComponent.CameraPosition, cameraComponent.CameraForward);
@@ -37,18 +40,13 @@ namespace PlayerComponents
                     movementComponent.Jump();
                 }
             }
-        }
-
-        void FixedUpdate()
-        {
-            var cameraDirection = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            cameraComponent.Rotate(cameraDirection, cameraSpeed * Time.fixedDeltaTime);
 
             if (grappleComponent.IsGrappled) return;
 
             var direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-            var translatedDirection = direction.x * Vector3.right + direction.y * Vector3.forward;
-            movementComponent.Move(translatedDirection, speed * Time.fixedDeltaTime);
+            var right = Vector3.Cross(Vector3.up, cameraComponent.CameraForward);
+            var translatedDirection = direction.x * right + direction.y * cameraComponent.CameraForward;
+            movementComponent.Move(translatedDirection, speed);
         }
     }
 }
